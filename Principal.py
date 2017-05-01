@@ -45,6 +45,13 @@ choose_comandos.bind("<Return>", detect_enter)
 consola = Text(principal, width=90, height=11, bg="white", relief="sunken")
 consola.grid(row=2, column=2, rowspan=10)
 
+power = 90
+barra_energia = ttk.Progressbar(orient="horizontal", mode="determinate", value=power, length=590)
+barra_energia.place(x=264, y=7)
+
+amount_energia = Label(text=str(power) + " %")
+amount_energia.place(x=860, y=8)
+
 
 
 
