@@ -1,0 +1,15 @@
+Comandos permitidos:
+
+1. hello
+2. built
+3. power
+4. status
+5. goahead
+6. goback
+7. right
+8. left
+9. dance
+10. music-on
+11. music-off
+12. smile
+13. cry
