@@ -2,7 +2,7 @@ Comandos permitidos:
 
 1. hello
 2. built
-3. power
+3. power(cant. energia)
 4. status
 5. goahead
 6. goback

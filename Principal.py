@@ -8,7 +8,6 @@ file_data = open("data.txt")
 read_data = file_data.read()
 data = json.loads(read_data)
 
-
 # Crea la ventana principal
 principal = Tk()
 principal.minsize(width=783, height=450)
@@ -44,12 +43,22 @@ def nombre_usuario(ign):
 # Entradas: ign, ign2, ign3
 # (estas variables existen para que la función se ejecute correctamente, no son usadas en ningún momento).
 # Salidas: Ninguna
-def prompt(ign, ing2, ing3):
+def prompt(ign, ign2, ign3):
     global var_comando
     if var_comando not in comando.get():
         choose_comando.insert(END, " ")
-        choose_comando.icursor(END)
+        choose_comando.icursor(len(var_comando))
 comando.trace_variable("w", prompt)
+
+# Impide que el prompt sea borrado.
+# Entradas: ign
+# (estas variables existen para que la función se ejecute correctamente, no son usadas en ningún momento).
+# Salidas: Ninguna
+def prompt_2(ign):
+    global var_comando
+    if choose_comando.index(INSERT) in list(range(0, (len(var_comando)))):
+        choose_comando.icursor(len(var_comando)+1)
+choose_comando.bind("<KeyPress>", prompt_2)
 
 
 instruccion1 = Label(ventana_usuario, text="Escriba su nombre")
@@ -61,13 +70,12 @@ entrada_usuario.place(x=18, y=50)
 
 entrada_usuario.bind("<Return>", nombre_usuario)
 
-
 # Coloca lista de comandos
 file_comandos = open("Comandos.txt", "r")
-comandos = file_comandos.read()
+comandos_data = file_comandos.read()
 lista_comandos = Label(principal,
                        bd=4,
-                       text=comandos,
+                       text=comandos_data,
                        height=15,
                        width=25,
                        relief="ridge",
@@ -76,8 +84,8 @@ lista_comandos = Label(principal,
                        anchor="w")
 lista_comandos.grid(row=1, column=1)
 
-L_comandos = Label(text="Escriba un número de comando (1, 2, 3...)")
-L_comandos.grid(row=2, column=1)
+ins_comandos = Label(text="Escriba un número de comando (1, 2, 3...)")
+ins_comandos.grid(row=2, column=1)
 
 exec_comandos = Button(text="Enviar")
 exec_comandos.grid(row=3, column=1, sticky="E")
@@ -103,5 +111,31 @@ sector5 = cuadricula.create_rectangle(4, 128, 128, 256, width=2)
 sector6 = cuadricula.create_rectangle(128, 128, 256, 256, width=2)
 sector7 = cuadricula.create_rectangle(256, 128, 384, 256, width=2)
 sector8 = cuadricula.create_rectangle(384, 128, 512, 256, width=2)
+
+
+imagen = PhotoImage(file=data["Imagen"])
+imagen_bot = cuadricula.create_image(64, 64, image=imagen, tag="bot")
+
+
+#comandos = {"hello":,
+#            "built":,
+#            "status":,
+#           "goahead":,
+#            "goback":,
+#            "right":,
+#            "left":,
+#            "dance":,
+#            "music-on":,
+#            "music-off":,
+#            "smile":,
+#            "cry": }
+
+
+
+
+
+# Comando para obtener coordenadas del bot
+print(cuadricula.coords("bot")[0])
+
 
 principal.mainloop()
