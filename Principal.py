@@ -116,7 +116,43 @@ sector8 = cuadricula.create_rectangle(384, 128, 512, 256, width=2)
 imagen = PhotoImage(file=data["Imagen"])
 imagen_bot = cuadricula.create_image(64, 64, image=imagen, tag="bot")
 
+def goahead():
+    if cuadricula.coords("bot")[1] == 64:
+        cuadricula.move("bot", 0, 128)
+    else:
+        cuadricula.move("bot", 0, -128)
 
+def goback():
+    if cuadricula.coords("bot")[1] == 64:
+        cuadricula.move("bot", 0, 128)
+    else:
+        cuadricula.move("bot", 0, -128)
+
+def right():
+    if cuadricula.coords("bot")[0] == 448:
+        cuadricula.move("bot", -384, 0)
+    else:
+        cuadricula.move("bot", 128, 0)
+
+def left():
+    if cuadricula.coords("bot")[0] == 64:
+        cuadricula.move("bot", 384, 0)
+    else:
+        cuadricula.move("bot", -128, 0)
+
+
+comandos = {"goahead":goahead, "goback":goback, "right":right, "left":left}
+
+
+
+
+def ejecucion(ign):
+    tmp = choose_comando.get()
+    cmd = tmp.split(" ")[1]
+    comandos[cmd]()
+
+
+choose_comando.bind("<Return>", ejecucion)
 #comandos = {"hello":,
 #            "built":,
 #            "status":,
@@ -135,7 +171,7 @@ imagen_bot = cuadricula.create_image(64, 64, image=imagen, tag="bot")
 
 
 # Comando para obtener coordenadas del bot
-print(cuadricula.coords("bot")[0])
+print()
 
 
 principal.mainloop()
