@@ -2,7 +2,7 @@
 # Autor: Alejandro Díaz Pereira. Carné: 2017172898
 
 from tkinter import *
-import tkinter.ttk as ttk
+import tkinter.ttk as ttk, json
 
 # Crea la ventana principal
 principal = Tk()
@@ -50,12 +50,16 @@ exec_comandos.grid(row=3, column=1, sticky="E")
 consola = Text(principal, width=73, height=11, bg="white", relief="sunken")
 consola.grid(row=2, column=2, rowspan=10)
 
-power = 90
+
+file_energia = open("data.txt")
+energia = file_energia.read()
+
+power = json.loads(energia)["Energia"]
 barra_energia = ttk.Progressbar(orient="horizontal", mode="determinate", value=power, length=480)
 barra_energia.place(x=264, y=7)
 
 amount_energia = Label(text=str(power) + " %")
-amount_energia.place(x=747, y=8)
+amount_energia.place(x=741, y=8)
 
 cuadricula = Canvas(principal, height=260, width=515, relief="groove")
 cuadricula.place(x=264, y=27)
