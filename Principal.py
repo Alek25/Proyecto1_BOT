@@ -2,9 +2,9 @@
 # Autor: Alejandro Díaz Pereira. Carné: 2017172898
 
 from tkinter import *
-import tkinter.ttk as ttk, json
+import tkinter.ttk as ttk, json, time
 
-file_data = open("data.txt")
+file_data = open("data.json")
 read_data = file_data.read()
 data = json.loads(read_data)
 
@@ -93,12 +93,22 @@ exec_comandos.grid(row=3, column=1, sticky="E")
 consola = Text(principal, width=73, height=11, bg="white", relief="sunken")
 consola.grid(row=2, column=2, rowspan=10)
 
-power = data["Energia"]
-barra_energia = ttk.Progressbar(orient="horizontal", mode="determinate", value=power, length=480)
+
+barra_energia = ttk.Progressbar(orient="horizontal", mode="determinate", value=data["Energia"], length=480)
 barra_energia.place(x=264, y=7)
 
-amount_energia = Label(text=str(power) + " %")
+amount_energia = Label(text=str(data["Energia"]) + " %")
 amount_energia.place(x=741, y=8)
+
+def mod_energia(val):
+    global data
+    file = open("data.json", "w")
+    data["Energia"] += val
+    guardar = json.dumps(data)
+    file.write(guardar)
+    barra_energia.config(value=data["Energia"])
+    amount_energia.config(text=str(data["Energia"]) + " %")
+
 
 cuadricula = Canvas(principal, height=260, width=515, relief="groove")
 cuadricula.place(x=264, y=27)
@@ -113,6 +123,8 @@ sector7 = cuadricula.create_rectangle(256, 128, 384, 256, width=2)
 sector8 = cuadricula.create_rectangle(384, 128, 512, 256, width=2)
 
 
+triste = PhotoImage(file="multimedia/bill_triste.gif")
+sonrisa = PhotoImage(file="multimedia/bill_sonrisa.gif")
 imagen = PhotoImage(file=data["Imagen"])
 imagen_bot = cuadricula.create_image(64, 64, image=imagen, tag="bot")
 
@@ -133,6 +145,7 @@ def right():
         cuadricula.move("bot", -384, 0)
     else:
         cuadricula.move("bot", 128, 0)
+    mod_energia(-1)
 
 def left():
     if cuadricula.coords("bot")[0] == 64:
@@ -140,38 +153,28 @@ def left():
     else:
         cuadricula.move("bot", -128, 0)
 
+def smile():
+    global sonrisa, imagen
+    cuadricula.itemconfigure("bot", image=sonrisa)
+    principal.update()
+    time.sleep(1)
+    cuadricula.itemconfigure("bot", image=imagen)
 
-comandos = {"goahead":goahead, "goback":goback, "right":right, "left":left}
+def cry():
+    global triste, imagen
+    cuadricula.itemconfigure("bot", image=triste)
+    principal.update()
+    time.sleep(1)
+    cuadricula.itemconfigure("bot", image=imagen)
 
 
-
+comandos = {"goahead":goahead, "goback":goback, "right":right, "left":left, "smile":smile, "cry":cry}
 
 def ejecucion(ign):
     tmp = choose_comando.get()
     cmd = tmp.split(" ")[1]
     comandos[cmd]()
 
-
 choose_comando.bind("<Return>", ejecucion)
-#comandos = {"hello":,
-#            "built":,
-#            "status":,
-#           "goahead":,
-#            "goback":,
-#            "right":,
-#            "left":,
-#            "dance":,
-#            "music-on":,
-#            "music-off":,
-#            "smile":,
-#            "cry": }
-
-
-
-
-
-# Comando para obtener coordenadas del bot
-print()
-
 
 principal.mainloop()

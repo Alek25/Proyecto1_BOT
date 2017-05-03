@@ -1,4 +1,0 @@
-{"Nombre": "C.I.P.H.E.R",
-"Energia": 10,
-"Descripccion": "Programa recursivo para el entretenimiento con interacción humana",
-"Imagen": "multimedia/bill.gif"}
