@@ -102,9 +102,9 @@ amount_energia.place(x=741, y=8)
 
 # Esta función modifica la energía al ejecutar cierto comando
 # Entradas: val (cantidad de energía)
-# Salidas: Ninguna
+#  Salidas: Ninguna
 def mod_energia(val):
-    global data
+    global data, barra_energia, amount_energia
     file = open("data.json", "w")
     data["Energia"] += val
     guardar = json.dumps(data)
@@ -112,23 +112,10 @@ def mod_energia(val):
     barra_energia.config(value=data["Energia"])
     amount_energia.config(text=str(data["Energia"]) + " %")
 
-
-cuadricula = Canvas(principal, height=260, width=515, relief="groove")
-cuadricula.place(x=264, y=27)
-
-sector2 = cuadricula.create_rectangle(128, 4, 256, 128, width=2)
-sector3 = cuadricula.create_rectangle(256, 4, 384, 128, width=2)
-sector4 = cuadricula.create_rectangle(384, 4, 512, 128, width=2)
-sector5 = cuadricula.create_rectangle(4, 128, 128, 256, width=2)
-sector6 = cuadricula.create_rectangle(128, 128, 256, 256, width=2)
-sector7 = cuadricula.create_rectangle(256, 128, 384, 256, width=2)
-sector8 = cuadricula.create_rectangle(384, 128, 512, 256, width=2)
-
 fondo = PhotoImage(file=data["Fondo"])
 triste = PhotoImage(file=data["Triste"])
 sonrisa = PhotoImage(file=data["Sonrisa"])
 imagen = PhotoImage(file=data["Imagen"])
-imagen_bot = cuadricula.create_image(64, 64, image=imagen, tag="bot")
 
 sector1 = Button(principal)
 sector2 = Button(principal)
@@ -175,17 +162,29 @@ colocar_boton(264,
 # Entradas: lista (Los botones a configurar)
 #           index (Se usa para seguir la lista de botones)
 # Salidas: Ninguna
-def config_sectores(lista, index):
-    global sonrisa, triste, fondo, imagen
+def init_sectores(lista, index):
+    global fondo, imagen
     if index == 8:
         return
     elif index == 0:
         lista[index].config(image=imagen)
-        return config_sectores(lista, index+1)
+        return init_sectores(lista, index+1)
     else:
         lista[index].config(image=fondo)
-        return config_sectores(lista, index+1)
-config_sectores(sectores, 0)
+        return init_sectores(lista, index+1)
+init_sectores(sectores, 0)
+
+
+def config_sectores(lista, index, place_bot):
+    global fondo, imagen
+    if index == 8:
+        return
+    elif index == place_bot:
+        lista[index].config(image=imagen)
+        return config_sectores(lista, index+1, place_bot)
+    else:
+        lista[index].config(image=fondo)
+        return config_sectores(lista, index+1, place_bot)
 
 # Indica el índice de la posición del bot, este índice se usará para la lista "sectores".
 # Entradas: lista (Conjunto de variables de los botones que forman la cuadrícula)
@@ -193,71 +192,68 @@ config_sectores(sectores, 0)
 # Salidas: index
 def where_bot(lista, index):
     global imagen
-    if lista[index].cget("image") == "pyimage4":
+    if lista[index].cget("image") in ["pyimage4", "pyimage2", "pyimage3"]:
         return index
     else:
         return where_bot(lista, index+1)
-
 
 # Mueve la imagen del bot (adelante)
 # Entradas: Ninguna
 # Salidas:. Ninguna
 def goahead():
-    if cuadricula.coords("bot")[1] == 64:
-        cuadricula.move("bot", 0, 128)
-    else:
-        cuadricula.move("bot", 0, -128)
-    mod_energia(-1)
+    global sectores
+    bot = where_bot(sectores, 0)
+    if bot in [4, 5, 6, 7]:
+        return config_sectores(sectores, 0, bot - 4), mod_energia(-1)
 
 # Mueve la imagen del bot (atrás)
 # Entradas: Ninguna
 # Salidas:. Ninguna
 def goback():
-    if cuadricula.coords("bot")[1] == 64:
-        cuadricula.move("bot", 0, 128)
-    else:
-        cuadricula.move("bot", 0, -128)
-    mod_energia(-1)
+    global sectores
+    bot = where_bot(sectores, 0)
+    if bot in [0, 1, 2, 3]:
+        return config_sectores(sectores, 0, bot + 4), mod_energia(-1)
 
 # Mueve la imagen del bot (derecha)
 # Entradas: Ninguna
 # Salidas:. Ninguna
 def right():
-    if cuadricula.coords("bot")[0] == 448:
-        cuadricula.move("bot", -384, 0)
-    else:
-        cuadricula.move("bot", 128, 0)
-    mod_energia(-1)
+    global sectores
+    bot = where_bot(sectores, 0)
+    if bot not in [3, 7]:
+        return config_sectores(sectores, 0, bot + 1), mod_energia(-1)
 
 # Mueve la imagen del bot (izquierda)
 # Entradas: Ninguna
 # Salidas:. Ninguna
 def left():
-    if cuadricula.coords("bot")[0] == 64:
-        cuadricula.move("bot", 384, 0)
-    else:
-        cuadricula.move("bot", -128, 0)
-    mod_energia(-1)
+    global sectores
+    bot = where_bot(sectores, 0)
+    if bot not in [0, 4]:
+        return config_sectores(sectores, 0, bot - 1), mod_energia(-1)
 
 # Hace que el bot sonría.
 # Entradas: Ninguna
 # Salidas:. Ninguna
 def smile():
-    global imagen
-    cuadricula.itemconfigure("bot", image=data["Sonrisa"])
+    global sectores, sonrisa, imagen
+    bot = where_bot(sectores, 0)
+    sectores[bot].config(image=sonrisa)
     principal.update()
     time.sleep(1)
-    cuadricula.itemconfigure("bot", image=imagen)
+    sectores[bot].config(image=imagen)
 
 # Hace que el bot llore.
 # Entradas: Ninguna
 # Salidas:. Ninguna
 def cry():
-    global imagen
-    cuadricula.itemconfigure("bot", image=data["Triste"])
+    global sectores, triste, imagen
+    bot = where_bot(sectores, 0)
+    sectores[bot].config(image=triste)
     principal.update()
     time.sleep(1)
-    cuadricula.itemconfigure("bot", image=imagen)
+    sectores[bot].config(image=imagen)
 
 
 comandos = {"goahead":goahead, "goback":goback, "right":right, "left":left, "smile":smile, "cry":cry}
@@ -266,6 +262,7 @@ comandos = {"goahead":goahead, "goback":goback, "right":right, "left":left, "smi
 # Entradas: Ninguna
 # Salidas:. Ninguna
 def ejecucion(ign):
+    global sectores
     tmp = choose_comando.get()
     cmd = tmp.split(" ")[1]
     if cmd in comandos:
