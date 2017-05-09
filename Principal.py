@@ -13,7 +13,7 @@ data = json.loads(read_data)
 
 # Crea la ventana principal
 principal = Tk()
-principal.minsize(width=783, height=450)
+principal.minsize(width=783, height=578)
 principal.title("C.I.P.H.E.R")
 
 entry_comando = StringVar()
@@ -35,19 +35,23 @@ var_comando = ""
 
 
 def nombre_usuario(ign):
+    global choose_comando
     if var_nombre.get() == "":
         global entry_comando, var_comando
         entry_comando.set("Invitado: ")
         var_comando = entry_comando.get()
         ventana_usuario.destroy()
+        choose_comando.focus_set()
+        choose_comando.icursor(END)
     else:
         entry_comando.set(var_nombre.get() + ": ")
         var_comando = entry_comando.get()
         ventana_usuario.destroy()
+        choose_comando.focus_set()
+        choose_comando.icursor(END)
 
 
 def quit_event():
-    print("Works")
     global entry_comando, var_comando, ventana_usuario
     entry_comando.set("Invitado: ")
     var_comando = "Invitado: "
@@ -93,6 +97,7 @@ instruccion2.pack()
 entrada_usuario.place(x=18, y=50)
 
 entrada_usuario.bind("<Return>", nombre_usuario)
+entrada_usuario.focus_set()
 
 # Coloca lista de comandos
 file_comandos = open("Comandos.txt", "r")
@@ -111,8 +116,8 @@ lista_comandos.grid(row=1, column=1)
 ins_comandos = Label(text="Escriba un número de comando (1, 2, 3...)")
 ins_comandos.grid(row=2, column=1)
 
-consola = Text(principal, width=73, height=11, bg="white", relief="sunken", state=DISABLED)
-consola.grid(row=2, column=2, rowspan=10)
+consola = Text(principal, width=111, height=10, bg="white", relief="sunken", state=DISABLED)
+consola.place(x=0, y=430)
 
 barra_energia = ttk.Progressbar(orient="horizontal", mode="determinate", value=data["Energia"], length=480)
 barra_energia.place(x=264, y=7)
@@ -141,7 +146,13 @@ def history(info):
     consola.insert(END, "]")
     consola.insert(END, " ")
     consola.insert(END, info)
+    consola.see(END)
     consola.config(state=DISABLED)
+
+
+# Se guarda el historial cada vez que se cierra el programa.
+# Entradas: Ninguna
+# Salidas: Ninguna
 
 
 def quit_event_main():
@@ -182,8 +193,23 @@ sector5 = Button(principal)
 sector6 = Button(principal)
 sector7 = Button(principal)
 sector8 = Button(principal)
+sector9 = Button(principal)
+sector10 = Button(principal)
+sector11 = Button(principal)
+sector12 = Button(principal)
 
-sectores = [sector1, sector2, sector3, sector4, sector5, sector6, sector7, sector8]
+sectores = [sector1,
+            sector2,
+            sector3,
+            sector4,
+            sector5,
+            sector6,
+            sector7,
+            sector8,
+            sector9,
+            sector10,
+            sector11,
+            sector12]
 
 
 # Se encarga de colocar los botones que conforma la cuadrícula para la imagen del bot
@@ -191,16 +217,16 @@ sectores = [sector1, sector2, sector3, sector4, sector5, sector6, sector7, secto
 # Entradas: x, y (posiciones iniciales para coocar los botones)
 #           lista (variables de cada botón)
 #           index (sirve para seguir la lista de variables)
-#           Todo lo demás son las opciones que llevan todos los botones.
+#           Todo lo demás son las opciones que llevan los botones.
 # Salidas: Ninguna
 
 
 def colocar_boton(x, y, lista, index, width, height, image, bd, relief):
-    if index == 3:
+    if index == 3 or index == 7:
         lista[index].config(width=width, height=height, image=image, bd=bd, relief=relief)
         lista[index].place(x=x, y=y)
         return colocar_boton(264, y + 134, lista, index + 1, width, height, image, bd, relief)
-    elif index == 7:
+    elif index == 11:
         lista[index].config(width=width, height=height, image=image, bd=bd, relief=relief)
         lista[index].place(x=x, y=y)
         return
@@ -228,10 +254,10 @@ colocar_boton(264,
 
 
 def init_sectores(lista, index):
-    global fondo, imagen
-    if index == 8:
+    global fondo, imagen, data
+    if index == 12:
         return
-    elif index == 0:
+    elif index == int(data["posu"]):
         lista[index].config(image=imagen)
         return init_sectores(lista, index + 1)
     else:
@@ -241,13 +267,19 @@ def init_sectores(lista, index):
 
 init_sectores(sectores, 0)
 
+# configura la cuadrícula del bot.
+# Entradas: lista (botones a configurar)
+#           index (Índice de la lista de sectores)
+#           place_bot (Índice donde será colocado el robot)
+# Salidas:. Ninguna
 
 def config_sectores(lista, index, place_bot):
-    global fondo, imagen
-    if index == 8:
+    global fondo, imagen, data
+    if index == 12:
         return
     elif index == place_bot:
         lista[index].config(image=imagen)
+        data["posu"] = index
         return config_sectores(lista, index + 1, place_bot)
     else:
         lista[index].config(image=fondo)
@@ -261,7 +293,7 @@ def config_sectores(lista, index, place_bot):
 
 
 def where_bot(lista, index):
-    global imagen
+    global imagen, data
     if lista[index].cget("image") in ["pyimage4", "pyimage2", "pyimage3"]:
         return index
     else:
@@ -276,7 +308,7 @@ def where_bot(lista, index):
 def goahead():
     global sectores
     bot = where_bot(sectores, 0)
-    if bot in [4, 5, 6, 7]:
+    if bot not in [0, 1, 2, 3]:
         return config_sectores(sectores, 0, bot - 4), mod_energia(-1)
 
 
@@ -288,7 +320,7 @@ def goahead():
 def goback():
     global sectores
     bot = where_bot(sectores, 0)
-    if bot in [0, 1, 2, 3]:
+    if bot not in [8, 9, 10, 11]:
         return config_sectores(sectores, 0, bot + 4), mod_energia(-1)
 
 
@@ -300,7 +332,7 @@ def goback():
 def right():
     global sectores
     bot = where_bot(sectores, 0)
-    if bot not in [3, 7]:
+    if bot not in [3, 7, 11]:
         return config_sectores(sectores, 0, bot + 1), mod_energia(-1)
 
 
@@ -312,7 +344,7 @@ def right():
 def left():
     global sectores
     bot = where_bot(sectores, 0)
-    if bot not in [0, 4]:
+    if bot not in [0, 4, 8]:
         return config_sectores(sectores, 0, bot - 1), mod_energia(-1)
 
 
@@ -344,13 +376,31 @@ def cry():
     sectores[bot].config(image=imagen)
 
 
-def power(cant):
-    return mod_energia(cant)
+# Hace que el bot salude y dé su descripcción.
+# Entradas: Ninguna
+# Salidas:. Ninguna
 
 
 def hello():
-    history("Hola, mi nombre es C.I.P.H.E.R, soy un Programa Emulador de Robots Con Interacción Humana.")
-    file = "/home/alejo/Sonido.wav"
+    history("Hola, me llamo C.I.P.H.E.R soy un " + data["Descripccion"])
+
+
+# Hace que el bot dé su fecha de creación.
+# Entradas: Ninguna
+# Salidas:. Ninguna
+
+
+def build():
+    history("Fui construido en " + data["Fecha_creacion"])
+
+
+# Hace que el bot dé la cantidad de energía restante.
+# Entradas: Ninguna
+# Salidas:. Ninguna
+
+
+def status():
+    history("Tengo " + str(data["Energia"]) + "% de energía")
 
 
 # Valida el comando que se le envía al bot
@@ -366,15 +416,19 @@ def ejec(ign):
                 "smile": smile,
                 "cry": cry,
                 "history": history,
-                "hello": hello}
+                "hello": hello,
+                "build": build,
+                "status": status}
     tmp = choose_comando.get()
     cmd = tmp.split(" ")[1]
     if cmd in comandos:
         comandos[cmd]()
+        choose_comando.delete(len(var_comando), END)
+    else:
+        history("Comando desconocido")
 
 
 choose_comando.bind("<Return>", ejec)
-
 exec_comandos = Button(text="Enviar")
 exec_comandos.grid(row=3, column=1, sticky="E")
 principal.mainloop()

@@ -1,3 +1,5 @@
 
 
-[5/5/2017 21:15:36] Hola, mi nombre es C.I.P.H.E.R, soy un Programa Emulador de Robots Con Interacción Humana.
+[5/5/2017 14:42:30] Comando desconocido
+
+[5/5/2017 14:42:36] Hola, me llamo C.I.P.H.E.R soy un Programa Emulador de Robots Con Interacción Humana.
